@@ -148,14 +148,26 @@ The following algorithm limits the concurrency:
 
     tokens <- number of concurrency tokens (= the concurrency limit)
     known_targets <- the top-level (root) targets
-    inferred_targets <- empty list
     guessed_targets <- empty list
-    while known_targets is not empty:
-        cur_target <- pop head from known_targets
-        explicit_deps <- check the build rules for any explicit dependencies of cur_target
-        push explicit_deps onto known_targets
-        guessed_deps <- check the history cache for any guessed dependencies of cur_target
-        push guessed_deps onto guessed_targets
-        if both explicit_deps and guessed_targets are empty:
-            run the job for building cur_target, if any dependency is encountered,
-            block on its completion and insert it into inferred_targets
+    procedure build_deps_(root_targets):
+        while known_targets is not empty:
+            cur_target <- pop head from known_targets
+            explicit_deps <- check the build rules for any explicit dependencies of cur_target
+            for each dep_target in explicit_deps:
+                build_deps(dep_target)
+            guessed_deps <- check the history cache for any guessed dependencies of cur_target
+            push guessed_deps onto guessed_targets
+            if explicit_deps is not empty:
+                push cur_target to the back of known_targets (will be built after its explicit dependencies)
+                continue the loop
+            if guessed_deps is not empty: (but explicit_deps was)
+
+            otherwise (i.e. both explicit_deps and guessed_deps are empty):
+                run_job(target=cur_target, priority=high)
+
+
+    procedure run_job takes two arguments: target & priority. Implementation:
+        take one concurrency token with the given priority (blocking until one is available)
+        run the job for building cur_target
+        (if any dependency is encountered, run its corresponding job immediately and block on its completion)
+        release one concurrency token
