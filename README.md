@@ -150,5 +150,9 @@ contains:
 
 * One node representing each target (root targets and all their dependencies).
 * An edge A -> B exists, if target A depends on target B.
-  - An edge will be tagged KNOWN if it follows from an explicit dependency (given in the build rules).
+  - An edge will be tagged KNOWN if it follows from an explicit dependency (given in the build rules) or detected during
+    runtime.
   - An edge will be tagged GUESS if it was inferred from previous runs (using the history cache).
+
+The graph can be calculated in advance with the exception of nodes representing dynamically determined dependencies and
+the edges connecting those nodes to the rest of the graph.
