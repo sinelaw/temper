@@ -34,10 +34,10 @@ Patterns are supported, for example, a rule can say any file `%.o` is built from
 
 Every process run by Temper is tracked for file system activity. If the process tries to read some file, Temper will
 record it as a dependency (or "input") of the current target file. Inputs themselves can be targets (such as
-auto-generated code), in which case Temper will first build the input before allowing the running process to actuall
+auto-generated code), in which case Temper will first build the input before allowing the running process to actually
 read it. In other words, Temper satisfies auto-generated build requirements on demand.
 
-The file system hook comunicates with an arbitrary server. The API of the file system hook is:
+The file system hook communicates with an arbitrary server. The API of the file system hook is:
 
 - Run a process
 - Whenever the process tries to access a file, make a call to the server describing the access.
@@ -92,13 +92,13 @@ For example of how dependencies are determined at run time, consider (Makefile s
 
 The first time `example_program` is being built, the job runner only knows what command needs to be run (`ld`), but the
 dependencies are unknown. While the command is being executed, the file system hook finds out that the file `module.o`
-is being access. The job runner can now be certain that `example_program` depends on `module.o`. The already runnning
+is being access. The job runner can now be certain that `example_program` depends on `module.o`. The already running
 `ld` is kept waiting while the dependency is satisfied. Since `module.o` itself appears in the build rules as a known
 target, a new command is executed (`gcc`) and in the same fashion `source.c` is found to be a dependency of
 `module.o`. Since `source.c` exists (it isn't a target itself), no further action is needed.
 
-Let's assume only the contents of `source.c` change, and then the job is run again. The depedency graph for the last run
-can be consulted and then `module.o` is built first, before the command for building `example_prgram` is executed.
+Let's assume only the contents of `source.c` change, and then the job is run again. The dependency graph for the last run
+can be consulted and then `module.o` is built first, before the command for building `example_program` is executed.
 
 In the above example none of the dependencies were specified explicitly, but users may choose to specify *some*
 dependencies for documentation or as hints that allow the build process to be parallelized also on the first run, when
@@ -151,7 +151,7 @@ contains:
 * One node representing each target (root targets and all their dependencies).
 * An edge A -> B exists, if target A depends on target B.
   - An edge will be tagged KNOWN if it follows from an explicit dependency (given in the build rules) or detected during
-    runtime.
+    run time.
   - An edge will be tagged GUESS if it was inferred from previous runs (using the history cache).
 
 The graph can be calculated in advance with the exception of nodes representing dynamically determined dependencies and
